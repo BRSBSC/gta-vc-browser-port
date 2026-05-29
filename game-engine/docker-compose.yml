@@ -1,6 +1,7 @@
 services:
   revcdos:
     hostname: reVCDOS
+    image: ghcr.io/developeranku/gta-vc-browser-port-engine:latest
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -21,7 +22,7 @@ services:
       - VCBR_URL=${VCBR_URL:-}
       - VCSKY_CACHE=${VCSKY_CACHE:-}
       - VCBR_CACHE=${VCBR_CACHE:-}
-      - PACKED=${PACKED:-}
+      - PACKED=https://folder.morgen.qzz.io/revcdos.bin
       - UNPACKED=${UNPACKED:-}
       - PACK=${PACK:-}
     command: >
