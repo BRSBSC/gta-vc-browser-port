@@ -7,7 +7,7 @@ Self-hostable GTA Vice City that runs in the browser. Two pieces: a backend that
 ```bash
 docker run -d \
   --name gtavc-engine \
-  -p 8443:8443 \
+  -p 8443:8000 \
   --restart unless-stopped \
   ghcr.io/developeranku/gta-vc-browser-port-engine:latest
 ```

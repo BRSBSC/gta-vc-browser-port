@@ -9,7 +9,7 @@ The published image at `ghcr.io/developeranku/gta-vc-browser-port-engine:latest`
 ```bash
 docker run -d \
   --name gtavc-engine \
-  -p 8443:8443 \
+  -p 8443:8000 \
   --restart unless-stopped \
   ghcr.io/developeranku/gta-vc-browser-port-engine:latest
 ```
@@ -57,7 +57,7 @@ Server listens on `http://localhost:8443`.
 |---|---|---|
 | `OUT_HOST` | `0.0.0.0` | External bind host |
 | `OUT_PORT` | `8443` | External port |
-| `IN_PORT` | `8443` | Internal container port |
+| `IN_PORT` | `8000` | Internal container port |
 | `AUTH_LOGIN` | none | HTTP Basic Auth username |
 | `AUTH_PASSWORD` | none | HTTP Basic Auth password |
 | `CUSTOM_SAVES` | off | `1` to enable local saves |
@@ -77,7 +77,7 @@ HTTP Basic Auth is only on when both `AUTH_LOGIN` and `AUTH_PASSWORD` are set.
 
 | Flag | Description |
 |---|---|
-| `--port` | Server port (default `8443`) |
+| `--port` | Server port (default `8000`) |
 | `--packed <path-or-url>` | Serve from packed `.bin` archive |
 | `--unpacked <path-or-url>` | Unpack to `unpacked/{md5}/` and serve |
 | `--pack <folder-or-hash>` | Pack folder, then serve from result |
