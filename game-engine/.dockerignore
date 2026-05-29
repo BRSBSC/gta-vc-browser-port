@@ -1,0 +1,17 @@
+.git
+.gitignore
+.dockerignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.bin
+.DS_Store
+.env
+.env.*
+docker-compose.yml
+vcbr/
+vcsky/
+saves/
+unpacked/
+colab_reVCDOS.ipynb

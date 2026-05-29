@@ -1,9 +1,9 @@
 # VICE CITY // Browser Port Launcher
 
-A small Astro frontend that wraps the [reVCDOS](../reVCDOS) browser port of GTA: Vice City inside a sandboxed iframe, with a Vice City themed landing page.
+A small Astro frontend that wraps the [game-engine](../game-engine) browser port of GTA: Vice City inside a sandboxed iframe, with a Vice City themed landing page.
 
 ```
-revc-launcher (Astro, :4321)  ──iframe──►  reVCDOS (Docker, :8000)
+web-launcher (Astro, :4321)  ──iframe──►  game-engine (Docker, :8000)
                   ▲
                   └── you open http://localhost:4321 in the browser
 ```
@@ -12,12 +12,12 @@ The wrapper never proxies game traffic. The browser fetches the wrapper from the
 
 ## Quick start
 
-### 1. Start the reVCDOS backend
+### 1. Start the game-engine backend
 
-From the `reVCDOS` directory (sibling of this one):
+From the `game-engine` directory (sibling of this one):
 
 ```bash
-cd ../reVCDOS
+cd ../game-engine
 docker compose up -d --build
 ```
 
@@ -26,7 +26,7 @@ Wait until `http://localhost:8000` responds (the first build downloads the asset
 ### 2. Install + run the wrapper
 
 ```bash
-cd revc-launcher
+cd web-launcher
 pnpm install     # or npm install / yarn / bun install
 pnpm dev         # or npm run dev
 ```
@@ -86,7 +86,7 @@ If the backend is offline when you click PLAY, you'll see an inline error card w
 ## Project layout
 
 ```
-revc-launcher/
+web-launcher/
 ├── astro.config.mjs
 ├── package.json
 ├── tsconfig.json
@@ -113,4 +113,4 @@ The output is static HTML/CSS/JS. You can serve `dist/` from any static host. Th
 ## Notes
 
 - Cross-origin iframe storage (IndexedDB, cookies) works in Chrome and Firefox on `localhost` by default. Safari's ITP can block third-party storage even on localhost. If saves don't persist in Safari, run the wrapper and backend on the same hostname (e.g. both behind nginx).
-- The reVCDOS port itself is MIT licensed by DOS Zone. This launcher only wraps it. Not affiliated with Rockstar Games.
+- The game-engine port itself is MIT licensed by DOS Zone. This launcher only wraps it. Not affiliated with Rockstar Games.
