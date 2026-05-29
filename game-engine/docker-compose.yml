@@ -27,8 +27,6 @@ services:
       - PACKED=https://folder.morgen.qzz.io/revcdos.bin
       - UNPACKED=${UNPACKED:-}
       - PACK=${PACK:-}
-      - ACME_EMAIL=${ACME_EMAIL}
-      - CF_API_TOKEN=${CF_API_TOKEN}
     command: >
       sh -c "python server.py
       --port $${IN_PORT:-8001}

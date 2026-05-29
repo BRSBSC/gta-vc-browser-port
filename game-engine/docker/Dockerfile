@@ -1,5 +1,5 @@
 FROM caddy:2-builder AS caddy-builder
-RUN xcaddy build --with github.com/caddy-dns/cloudflare
+RUN xcaddy build
 
 FROM python:3.11-slim
 
