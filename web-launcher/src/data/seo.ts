@@ -4,7 +4,8 @@ export const OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const FAVICON = '/icon.ico';
 export const LOGO = '/vice-city-logo.webp';
 export const MANIFEST = '/manifest.webmanifest';
-export const SITEMAP = '/sitemap.xml';
+export const SITEMAP = '/sitemap-index.xml';
+export const GA_MEASUREMENT_ID = 'G-GNHJPLHH37';
 
 export const seo = {
   title: 'Play GTA Vice City Online Free - Instant, No Download',

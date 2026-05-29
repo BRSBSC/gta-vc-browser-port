@@ -9,6 +9,7 @@ import {
   FAVICON,
   MANIFEST,
   SITEMAP,
+  GA_MEASUREMENT_ID,
 } from '../data/seo';
 
 interface Props {
@@ -80,3 +81,12 @@ const { gameOrigin } = Astro.props;
 <script type="application/ld+json" set:html={JSON.stringify(videoGameSchema)} />
 <script type="application/ld+json" set:html={JSON.stringify(webAppSchema)} />
 <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+
+<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>
+<script
+  is:inline
+  set:html={`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`}
+/>
