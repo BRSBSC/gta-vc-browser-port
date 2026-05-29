@@ -1,0 +1,24 @@
+---
+import SeoHead from '../components/SeoHead.astro';
+import '../styles/global.css';
+
+interface Props {
+  gameUrl?: string;
+}
+const { gameUrl } = Astro.props;
+const gameOrigin = gameUrl ? new URL(gameUrl).origin : undefined;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <SeoHead gameOrigin={gameOrigin} />
+    {gameUrl && (
+      <script is:inline define:vars={{ gameUrl }}>
+        window.__GAME_URL__ = gameUrl;
+      </script>
+    )}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

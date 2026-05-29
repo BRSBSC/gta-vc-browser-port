@@ -1,0 +1,48 @@
+---
+import { LOGO } from '../data/seo';
+
+const SANDBOX = 'allow-scripts allow-same-origin allow-pointer-lock allow-forms allow-popups-to-escape-sandbox allow-modals';
+const ALLOW = 'fullscreen; gamepad; autoplay; clipboard-read; clipboard-write';
+---
+<section id="overlay" class="overlay" hidden>
+  <header class="topbar">
+    <div class="topbar-left">
+      <img class="topbar-logo" src={LOGO} alt="Vice City" width="170" height="34" />
+    </div>
+    <nav class="topbar-actions" aria-label="Game controls">
+      <button id="fs" class="menu-item" type="button" aria-label="Toggle fullscreen">
+        <svg class="ico-fs" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9 V4 H9 M15 4 H20 V9 M20 15 V20 H15 M9 20 H4 V15"
+                stroke-width="2.4" stroke-linecap="square" stroke-linejoin="miter"
+                fill="none" stroke="currentColor" />
+        </svg>
+        <svg class="ico-fs-exit" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 4 V9 H4 M20 9 H15 V4 M15 20 V15 H20 M4 15 H9 V20"
+                stroke-width="2.4" stroke-linecap="square" stroke-linejoin="miter"
+                fill="none" stroke="currentColor" />
+        </svg>
+        <span class="bar-label" data-default="FULLSCREEN" data-active="WINDOWED">FULLSCREEN</span>
+      </button>
+      <button id="exit" class="menu-item menu-item-exit" type="button" aria-label="Exit">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6 L18 18 M18 6 L6 18"
+                stroke-width="2.4" stroke-linecap="square"
+                fill="none" stroke="currentColor" />
+        </svg>
+        <span>EXIT</span>
+      </button>
+    </nav>
+  </header>
+  <div class="overlay-stage" id="frame-stage" aria-live="polite"></div>
+</section>
+
+<template id="frame-tpl">
+  <iframe
+    class="game-frame"
+    title="GTA Vice City"
+    sandbox={SANDBOX}
+    allow={ALLOW}
+    referrerpolicy="no-referrer"
+    loading="eager"
+  ></iframe>
+</template>

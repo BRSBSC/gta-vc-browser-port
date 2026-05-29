@@ -1,0 +1,37 @@
+{
+  "name": "GTA Vice City Browser Port",
+  "short_name": "Vice City",
+  "description": "Play GTA Vice City online free in your browser. Self-hostable port of the classic 2002 game runs in WebAssembly.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#06010c",
+  "theme_color": "#0a0a1a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "/icon.ico",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.ico",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vice City browser port landing page"
+    }
+  ]
+}
