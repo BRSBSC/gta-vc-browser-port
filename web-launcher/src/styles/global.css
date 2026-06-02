@@ -411,7 +411,7 @@ body {
   border-radius: 4px;
   background: rgba(255, 179, 71, 0.12);
   color: var(--vc-gold);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-weight: 700;
   font-size: clamp(0.62rem, 1.35vw, 0.82rem);
   line-height: 1.25;
@@ -421,7 +421,7 @@ body {
   animation: warnPulse 1.7s ease-in-out infinite;
   transition: opacity 0.5s ease;
 }
-.topbar-warn.is-out { opacity: 0; animation: none; }
+.topbar-warn.is-out { opacity: 0; animation: none; pointer-events: none; }
 
 .warn-ico {
   width: 17px;
@@ -448,7 +448,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .topbar-warn { animation: none; }
+  .topbar-warn { animation: none; transition: none; }
 }
 
 .menu-item {

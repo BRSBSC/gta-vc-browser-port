@@ -6,6 +6,8 @@ declare global {
 
 const GAME_URL = window.__GAME_URL__ || 'https://engine.gtavice.city:8443';
 
+const LOAD_WARNING_MS = 60_000;
+
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
 const playBtn = $<HTMLButtonElement>('#play');
@@ -19,16 +21,20 @@ const loadWarn = $<HTMLElement>('#load-warn');
 let warnTimer: number | undefined;
 
 function showLoadWarning() {
-  if (warnTimer) clearTimeout(warnTimer);
+  if (warnTimer !== undefined) clearTimeout(warnTimer);
   loadWarn.classList.remove('is-out');
-  warnTimer = window.setTimeout(() => loadWarn.classList.add('is-out'), 60000);
+  warnTimer = window.setTimeout(() => {
+    loadWarn.classList.add('is-out');
+    warnTimer = undefined;
+  }, LOAD_WARNING_MS);
 }
 
 function clearLoadWarning() {
-  if (warnTimer) {
+  if (warnTimer !== undefined) {
     clearTimeout(warnTimer);
     warnTimer = undefined;
   }
+  loadWarn.classList.remove('is-out');
 }
 
 function mountGame() {
