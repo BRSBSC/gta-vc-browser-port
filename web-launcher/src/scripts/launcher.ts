@@ -14,6 +14,22 @@ const stage = $<HTMLDivElement>('#frame-stage');
 const tpl = $<HTMLTemplateElement>('#frame-tpl');
 const exitBtn = $<HTMLButtonElement>('#exit');
 const fsBtn = $<HTMLButtonElement>('#fs');
+const loadWarn = $<HTMLElement>('#load-warn');
+
+let warnTimer: number | undefined;
+
+function showLoadWarning() {
+  if (warnTimer) clearTimeout(warnTimer);
+  loadWarn.classList.remove('is-out');
+  warnTimer = window.setTimeout(() => loadWarn.classList.add('is-out'), 60000);
+}
+
+function clearLoadWarning() {
+  if (warnTimer) {
+    clearTimeout(warnTimer);
+    warnTimer = undefined;
+  }
+}
 
 function mountGame() {
   stage.replaceChildren();
@@ -28,6 +44,7 @@ function openOverlay() {
   overlay.hidden = false;
   document.body.style.overflow = 'hidden';
   mountGame();
+  showLoadWarning();
 }
 
 function closeOverlay() {
@@ -38,6 +55,7 @@ function closeOverlay() {
   overlay.removeAttribute('data-fs');
   document.body.style.overflow = '';
   stage.replaceChildren();
+  clearLoadWarning();
 }
 
 async function toggleFullscreen() {

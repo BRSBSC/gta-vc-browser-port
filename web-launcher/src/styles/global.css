@@ -391,6 +391,66 @@ body {
   gap: 2px;
 }
 
+.topbar-mid {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.topbar-warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.28rem 0.8rem;
+  border: 1px solid rgba(255, 216, 77, 0.4);
+  border-radius: 4px;
+  background: rgba(255, 179, 71, 0.12);
+  color: var(--vc-gold);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 700;
+  font-size: clamp(0.62rem, 1.35vw, 0.82rem);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  animation: warnPulse 1.7s ease-in-out infinite;
+  transition: opacity 0.5s ease;
+}
+.topbar-warn.is-out { opacity: 0; animation: none; }
+
+.warn-ico {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(255, 179, 71, 0.6));
+}
+.warn-short { display: none; }
+
+@keyframes warnPulse {
+  0%, 100% {
+    border-color: rgba(255, 216, 77, 0.35);
+    box-shadow: 0 0 0 0 rgba(255, 179, 71, 0);
+  }
+  50% {
+    border-color: rgba(255, 216, 77, 0.9);
+    box-shadow: 0 0 14px 0 rgba(255, 179, 71, 0.4);
+  }
+}
+
+@media (max-width: 768px) {
+  .warn-full  { display: none; }
+  .warn-short { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar-warn { animation: none; }
+}
+
 .menu-item {
   position: relative;
   display: inline-flex;
@@ -474,4 +534,7 @@ body {
   .topbar-logo  { height: 28px; }
   .menu-item    { padding: 0 0.7rem; font-size: 1rem; letter-spacing: 0.14em; }
   .menu-item span { display: none; }
+  .topbar-mid   { padding: 0 0.3rem; }
+  .topbar-warn  { padding: 0.18rem 0.5rem; gap: 0.35rem; }
+  .warn-ico     { width: 15px; height: 15px; }
 }

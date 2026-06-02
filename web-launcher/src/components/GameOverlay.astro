@@ -9,6 +9,18 @@ const ALLOW = 'fullscreen; gamepad; autoplay; clipboard-read; clipboard-write';
     <div class="topbar-left">
       <img class="topbar-logo" src={LOGO} alt="Vice City" width="170" height="34" />
     </div>
+    <div class="topbar-mid">
+      <p id="load-warn" class="topbar-warn" role="status" aria-live="polite">
+        <svg class="warn-ico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 L22 20 L2 20 Z" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linejoin="round" />
+          <path d="M12 9 V14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          <path d="M12 16.7 V17.3" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" />
+        </svg>
+        <span class="warn-text warn-full">Game is loading, please wait 10-15 seconds. Do not close this window if the screen looks blank.</span>
+        <span class="warn-text warn-short">Loading, wait 10-15s. Don't close if the screen is blank.</span>
+      </p>
+    </div>
     <nav class="topbar-actions" aria-label="Game controls">
       <button id="fs" class="menu-item" type="button" aria-label="Toggle fullscreen">
         <svg class="ico-fs" viewBox="0 0 24 24" aria-hidden="true">
