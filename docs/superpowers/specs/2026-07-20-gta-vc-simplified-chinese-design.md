@@ -6,6 +6,7 @@
 - 状态：设计方向和书面规格已于 2026-07-20 经用户复核批准
 - 目标：增加简体中文菜单和剧情字幕，保留英文语音
 - 分发方式：先提交到本地 Git 仓库，不自动推送
+- 资源保存：提交三个净化后的散文件，不生成或提交二次 ZIP 归档
 
 ## 背景
 
@@ -152,11 +153,17 @@ Emscripten 端的文本、映射表和字体索引必须显式使用 `char16_t` 
 
 ### 3. 中文资源
 
-Git 中保存一个净化后的资源归档：
+Git 中直接保存三个净化后的资源文件：
 
-`game-engine/resources/zh/koishi-assets.zip`
+```text
+game-engine/resources/zh/wm_vcchs.gxt
+game-engine/resources/zh/wm_vcchs.txd
+game-engine/resources/zh/wm_vcchs.dat
+```
 
-归档只包含 GXT、TXD、DAT，不包含 `Mss32.dll`、`OriginalMss32.dll` 或 `wm_vcchs.asi`。构建前必须校验三项资源的 SHA-256。
+资源目录不包含二次 ZIP、`Mss32.dll`、`OriginalMss32.dll` 或
+`wm_vcchs.asi`。准备脚本从本地原始 ZIP 中只提取上述三个文件，写入
+正式路径前校验原始 ZIP 和三项资源的 SHA-256；原始 ZIP 保持未跟踪。
 
 中文数据包使用以下虚拟路径：
 
@@ -188,7 +195,7 @@ Git 中保存一个净化后的资源归档：
 ```text
 Koishi 原始 ZIP
   -> 静态提取并校验 GXT/TXD/DAT
-  -> 净化资源归档进入 Git
+  -> 三个净化后的散文件进入 Git
 
 取得的固定 vc-sky 源码 + Emscripten 适配 + 中文渲染补丁
   -> vc-sky-zh-v6.wasm
@@ -216,7 +223,7 @@ Koishi 原始 ZIP
 ## Git 与分发约束
 
 - 设计批准授权的是本地 Git 提交；推送是单独操作，未收到明确请求前不推送。
-- 原始用户 ZIP 保持未跟踪；产品提交只加入净化后的资源归档及必要源码、脚本和文档。
+- 原始用户 ZIP 保持未跟踪；产品提交只加入三个净化后的散文件及必要源码、脚本和文档，不加入二次 ZIP。
 - 汉化程序移植代码保留无名汉化组 MIT 版权和许可声明。
 - 翻译与字库资源缺少明确再分发许可，本设计按用户私人使用决定纳入本地仓库；若以后推送到公开仓库或公共 GHCR，需要再次确认分发风险。
 
@@ -226,7 +233,7 @@ Koishi 原始 ZIP
 
 ### 自动检查
 
-1. 净化资源归档不含 `.dll` 或 `.asi`。
+1. 中文资源目录中的游戏资源恰为指定的 GXT/TXD/DAT 三项；可保留 README，但不含 ZIP、`.dll` 或 `.asi`。
 2. 三项资源 SHA-256 与设计记录一致。
 3. GXT 包含 79 个表且 `MAIN` 中存在中文字符。
 4. 中文数据清单所有区间连续、不重叠，最终偏移等于 `remote_package_size`。

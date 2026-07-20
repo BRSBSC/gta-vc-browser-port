@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # Claude
 .claude/
+
+# Private source archive; only the extracted GXT/TXD/DAT files are tracked.
+/【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip

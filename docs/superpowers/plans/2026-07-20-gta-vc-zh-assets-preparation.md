@@ -1,23 +1,25 @@
-# GTA VC 简体中文资源准备实施计划
+# GTA VC 简体中文散文件资源准备实施计划
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 把用户提供的 Koishi 汉化补丁净化为可校验、可提交的 GXT/TXD/DAT 资源归档，并明确阻止在完整 vc-sky 构建源缺失时接入无效的 `lang=zh`。
+**Goal:** 从用户提供的 Koishi 原始补丁 ZIP 中只提取并提交 GXT/TXD/DAT 三个散文件，不生成或保留二次 ZIP，也不提前接入无效的 `lang=zh`。
 
-**Architecture:** 使用一个仅依赖 Python 标准库的命令行脚本校验原始 ZIP 和三个资源的 SHA-256，验证 GXT 表结构，然后生成只含 GXT/TXD/DAT、成员顺序与时间戳固定的 ZIP。一个 `unittest` 集成检查锁定归档文件列表、哈希、79 个 GXT 表和中文字符；本阶段不修改启动器、不生成 WASM。
+**Architecture:** 使用一个仅依赖 Python 标准库的命令行脚本锁定原始 ZIP 与三项资源的 SHA-256，验证 GXT 的 TABL/TKEY/TDAT 结构，再通过临时文件把三个资源写入 `game-engine/resources/zh/`。一个 `unittest` 契约检查锁定散文件集合、哈希、79 个 GXT 表和 `MAIN` 中文字符；README 可以同目录保留，本阶段不修改启动器或生成 WASM。
 
-**Tech Stack:** Python 3.11 标准库（`argparse`、`hashlib`、`struct`、`zipfile`、`unittest`）、Git。
+**Tech Stack:** Python 3.11 标准库（`argparse`、`hashlib`、`pathlib`、`struct`、`zipfile`、`unittest`）、Git。
 
 ## Global Constraints
 
-- 仅处理 `wm_vcchs.gxt`、`wm_vcchs.txd`、`wm_vcchs.dat`；不得执行或提交 DLL/ASI。
+- 只提取和提交 `wm_vcchs.gxt`、`wm_vcchs.txd`、`wm_vcchs.dat`；不得提取、执行或提交 DLL/ASI。
 - 原始 ZIP 的 SHA-256 必须为 `0A8F32C2D6ADFB11D32A14F84E42F77C6C1ED1D368F5FF468B1DCCF213F46783`。
-- 当前工作区未检测到原始 ZIP；执行生成步骤前必须由用户把同名文件重新放回仓库根目录，不得用名称或哈希不同的补丁替代。
 - 三项资源的 SHA-256 必须与设计规格完全一致。
-- 生成归档必须只包含三个平铺文件名，不保留 Windows 可执行文件或原目录结构。
+- `game-engine/resources/zh/` 中的游戏资源必须恰为上述三个散文件；可保留 README，但不得包含 ZIP、DLL 或 ASI。
+- GXT 必须包含 79 个唯一表和 `MAIN` 表；TKEY 记录宽度按真实 VC GXT 格式固定为 12 字节。
 - 不新增 Python 依赖，不修改 `game-engine/requirements.txt`。
 - 不修改 `game-engine/dist/game.js`、`index.js`、`index.html` 或任何语言入口。
-- 完整 vc-sky 游戏源码、Emscripten 构建链和许可未取得前，不创建假的中文 WASM、`packages/zh.js` 或 `asm_consts/zh.js`。
+- 完整 vc-sky 游戏源码、Emscripten 构建链和许可未取得前，不创建中文 WASM、`packages/zh.js` 或 `asm_consts/zh.js`。
+- 原始用户 ZIP 保留在仓库根目录但由 `.gitignore` 忽略；不得把它加入 Git。
+- 用户已选择重写未推送的本地实现历史，使 `koishi-assets.zip` 不出现在最终可达 Git 历史中。
 - 只提交到本地 Git；未收到明确请求前不推送。
 
 ---
@@ -26,64 +28,74 @@
 
 | 文件 | 责任 |
 |---|---|
-| `.gitignore` | 忽略根目录中的原始 Koishi ZIP，防止把 DLL/ASI 一起提交。 |
-| `game-engine/utils/prepare_zh_assets.py` | 校验原始补丁、验证 GXT、生成并复查净化归档。 |
-| `game-engine/utils/test_prepare_zh_assets.py` | 对提交后的净化归档执行一个可重复的集成检查。 |
-| `game-engine/resources/zh/koishi-assets.zip` | 仅保存 GXT/TXD/DAT 的压缩资源。 |
-| `game-engine/resources/zh/README.md` | 记录来源、哈希、生成命令、私人使用边界和 vc-sky 源码门槛。 |
+| `.gitignore` | 忽略根目录原始 Koishi ZIP，并说明 Git 跟踪三个散文件。 |
+| `game-engine/utils/prepare_zh_assets.py` | 校验原始补丁、验证 GXT、提取并复查三个散文件。 |
+| `game-engine/utils/test_prepare_zh_assets.py` | 检查已提交散文件集合、哈希和 GXT 结构。 |
+| `game-engine/resources/zh/wm_vcchs.gxt` | 简体中文菜单、剧情和任务文本。 |
+| `game-engine/resources/zh/wm_vcchs.txd` | 中文字形纹理。 |
+| `game-engine/resources/zh/wm_vcchs.dat` | 中文字形映射。 |
+| `game-engine/resources/zh/README.md` | 记录来源、哈希、复现命令、私人使用边界和 WASM 源码门槛。 |
 
-本阶段不创建其他文件。完整中文 WASM 集成必须在取得真实构建源后另写第二份实施计划。
+删除 `game-engine/resources/zh/koishi-assets.zip`。本阶段不创建其他产品文件；完整中文 WASM 集成必须在取得真实构建源后另写计划。
 
-### Task 1: 生成并锁定净化后的中文资源归档
+### Task 1: 改为生成并校验三个中文资源散文件
 
 **Files:**
 - Modify: `.gitignore`
-- Create: `game-engine/utils/prepare_zh_assets.py`
-- Create: `game-engine/utils/test_prepare_zh_assets.py`
-- Create: `game-engine/resources/zh/koishi-assets.zip`
-- Create: `game-engine/resources/zh/README.md`
+- Modify: `game-engine/utils/prepare_zh_assets.py`
+- Modify: `game-engine/utils/test_prepare_zh_assets.py`
+- Modify: `game-engine/resources/zh/README.md`
+- Delete: `game-engine/resources/zh/koishi-assets.zip`
+- Create: `game-engine/resources/zh/wm_vcchs.gxt`
+- Create: `game-engine/resources/zh/wm_vcchs.txd`
+- Create: `game-engine/resources/zh/wm_vcchs.dat`
 
 **Interfaces:**
-- Consumes: 根目录 `【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip`，SHA-256 固定为 `0A8F32C2D6ADFB11D32A14F84E42F77C6C1ED1D368F5FF468B1DCCF213F46783`。
-- Produces: `prepare_archive(source: pathlib.Path, output: pathlib.Path) -> dict[str, int]`。
-- Produces: `validate_archive(path: pathlib.Path) -> dict[str, int]`，返回 `table_count`、`cjk_count` 与 `main_cjk_count`。
-- Produces: `game-engine/resources/zh/koishi-assets.zip`，成员顺序与名称精确为 `wm_vcchs.gxt`、`wm_vcchs.txd`、`wm_vcchs.dat`。
+- Consumes: 根目录 `【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip`。
+- Produces: `prepare_assets(source: pathlib.Path, output_dir: pathlib.Path) -> dict[str, int]`。
+- Produces: `validate_assets(directory: pathlib.Path) -> dict[str, int]`，返回 `table_count`、`cjk_count` 与 `main_cjk_count`。
+- Produces: `game-engine/resources/zh/` 中三个固定名称、固定哈希的游戏资源散文件。
 
-- [ ] **Step 1: 先写会失败的归档契约测试**
+- [ ] **Step 1: 先把归档测试改成散文件契约测试**
 
-创建 `game-engine/utils/test_prepare_zh_assets.py`：
+用以下完整内容替换 `game-engine/utils/test_prepare_zh_assets.py`：
 
 ```python
 from pathlib import Path
 import sys
 import unittest
-import zipfile
 
 
 UTILS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(UTILS_DIR))
 
-from prepare_zh_assets import EXPECTED_FILES, FIXED_TIMESTAMP, validate_archive
+try:
+    from prepare_zh_assets import EXPECTED_FILES, validate_assets
+except ImportError as error:
+    MISSING_IMPLEMENTATION = error
+else:
+    MISSING_IMPLEMENTATION = None
 
 
-ARCHIVE = UTILS_DIR.parent / "resources" / "zh" / "koishi-assets.zip"
+ASSET_DIR = UTILS_DIR.parent / "resources" / "zh"
 
 
 class ZhAssetsTest(unittest.TestCase):
-    def test_sanitized_archive_contract(self) -> None:
-        summary = validate_archive(ARCHIVE)
-
-        with zipfile.ZipFile(ARCHIVE) as archive:
-            infos = archive.infolist()
-            self.assertEqual(
-                [info.filename for info in infos],
-                list(EXPECTED_FILES),
+    def test_extracted_assets_contract(self) -> None:
+        if MISSING_IMPLEMENTATION is not None:
+            self.fail(
+                f"{MISSING_IMPLEMENTATION.__class__.__name__}: "
+                f"{MISSING_IMPLEMENTATION}"
             )
-            for info in infos:
-                self.assertEqual(info.date_time, FIXED_TIMESTAMP)
-                self.assertEqual(info.create_system, 3)
-                self.assertEqual(info.external_attr >> 16, 0o100644)
 
+        summary = validate_assets(ASSET_DIR)
+        file_names = sorted(
+            path.name
+            for path in ASSET_DIR.iterdir()
+            if path.is_file()
+        )
+
+        self.assertEqual(file_names, sorted([*EXPECTED_FILES, "README.md"]))
         self.assertEqual(summary["table_count"], 79)
         self.assertGreater(summary["cjk_count"], 100)
         self.assertGreater(summary["main_cjk_count"], 0)
@@ -93,7 +105,7 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Step 2: 运行测试并确认它因实现尚不存在而失败**
+- [ ] **Step 2: 运行测试并确认新接口尚不存在**
 
 Run:
 
@@ -101,11 +113,11 @@ Run:
 python -m unittest discover -s game-engine/utils -p "test_prepare_zh_assets.py" -v
 ```
 
-Expected: FAIL，包含 `ModuleNotFoundError: No module named 'prepare_zh_assets'`。
+Expected: FAIL，包含 `ImportError` 和 `cannot import name 'validate_assets'`；这是接口尚未实现导致的断言失败，而不是语法或测试发现错误。
 
-- [ ] **Step 3: 实现最小资源准备与校验脚本**
+- [ ] **Step 3: 实现最小散文件准备与校验脚本**
 
-创建 `game-engine/utils/prepare_zh_assets.py`：
+用以下完整内容替换 `game-engine/utils/prepare_zh_assets.py`：
 
 ```python
 from __future__ import annotations
@@ -119,7 +131,6 @@ import zipfile
 
 
 SOURCE_SHA256 = "0a8f32c2d6adfb11d32a14f84e42f77c6c1ed1d368f5ff468b1dccf213f46783"
-
 SOURCE_ENTRIES = {
     "plugins/wm_vcchs/wm_vcchs.gxt": (
         "wm_vcchs.gxt",
@@ -134,13 +145,11 @@ SOURCE_ENTRIES = {
         "7ffa7c843678610e42c4e3fd2b2647e8ff573136463f4054443d129d2a054c3d",
     ),
 }
-
 EXPECTED_FILES = {
     destination: digest
     for destination, digest in SOURCE_ENTRIES.values()
 }
-
-FIXED_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+OPTIONAL_FILES = {"README.md"}
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -178,11 +187,10 @@ def inspect_gxt(data: bytes) -> dict[str, int]:
     cjk_count = 0
     main_cjk_count = 0
     for name, table_offset in records:
-        candidates = (table_offset, table_offset + 8)
         tkey_offset = next(
             (
                 candidate
-                for candidate in candidates
+                for candidate in (table_offset, table_offset + 8)
                 if 0 <= candidate <= len(data) - 8
                 and data[candidate : candidate + 4] == b"TKEY"
             ),
@@ -192,8 +200,9 @@ def inspect_gxt(data: bytes) -> dict[str, int]:
             raise ValueError(f"{name} 表缺少 TKEY 块")
 
         tkey_size = struct.unpack_from("<I", data, tkey_offset + 4)[0]
-        if tkey_size % 8 != 0:
+        if tkey_size % 12 != 0:
             raise ValueError(f"{name} 表的 TKEY 长度无效")
+
         tdat_offset = tkey_offset + 8 + tkey_size
         if (
             not 0 <= tdat_offset <= len(data) - 8
@@ -228,25 +237,31 @@ def inspect_gxt(data: bytes) -> dict[str, int]:
     }
 
 
-def validate_archive(path: Path) -> dict[str, int]:
-    with zipfile.ZipFile(path) as archive:
-        names = archive.namelist()
-        if names != list(EXPECTED_FILES):
-            raise ValueError(f"净化归档成员不匹配: {names}")
+def validate_assets(directory: Path) -> dict[str, int]:
+    entry_names = {path.name for path in directory.iterdir()}
+    unexpected_names = sorted(
+        entry_names - set(EXPECTED_FILES) - OPTIONAL_FILES
+    )
+    if unexpected_names:
+        raise ValueError(f"中文资源目录包含意外项目: {unexpected_names}")
 
-        payloads: dict[str, bytes] = {}
-        for name, expected_hash in EXPECTED_FILES.items():
-            if Path(name).suffix.lower() in {".dll", ".asi"}:
-                raise ValueError(f"净化归档包含可执行插件: {name}")
-            payload = archive.read(name)
-            if sha256_bytes(payload) != expected_hash:
-                raise ValueError(f"{name} 的 SHA-256 不匹配")
-            payloads[name] = payload
+    resource_names = sorted(
+        entry_names & set(EXPECTED_FILES)
+    )
+    if resource_names != sorted(EXPECTED_FILES):
+        raise ValueError(f"中文资源文件集合不匹配: {resource_names}")
+
+    payloads: dict[str, bytes] = {}
+    for name, expected_hash in EXPECTED_FILES.items():
+        payload = (directory / name).read_bytes()
+        if sha256_bytes(payload) != expected_hash:
+            raise ValueError(f"{name} 的 SHA-256 不匹配")
+        payloads[name] = payload
 
     return inspect_gxt(payloads["wm_vcchs.gxt"])
 
 
-def prepare_archive(source: Path, output: Path) -> dict[str, int]:
+def prepare_assets(source: Path, output_dir: Path) -> dict[str, int]:
     if sha256_file(source) != SOURCE_SHA256:
         raise ValueError("原始 Koishi ZIP 的 SHA-256 不匹配")
 
@@ -259,56 +274,46 @@ def prepare_archive(source: Path, output: Path) -> dict[str, int]:
             payloads[destination] = payload
 
     inspect_gxt(payloads["wm_vcchs.gxt"])
-    output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = output.with_name(f"{output.name}.tmp")
-
-    if temporary.exists():
-        temporary.unlink()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    temporary_files: list[Path] = []
 
     try:
-        with zipfile.ZipFile(temporary, "w") as archive:
-            for name in EXPECTED_FILES:
-                info = zipfile.ZipInfo(name, FIXED_TIMESTAMP)
-                info.create_system = 3
-                info.external_attr = 0o100644 << 16
-                archive.writestr(
-                    info,
-                    payloads[name],
-                    compress_type=zipfile.ZIP_DEFLATED,
-                    compresslevel=9,
-                )
-        summary = validate_archive(temporary)
-        temporary.replace(output)
+        for name, payload in payloads.items():
+            temporary = output_dir / f".{name}.tmp"
+            temporary_files.append(temporary)
+            temporary.write_bytes(payload)
+            if sha256_file(temporary) != EXPECTED_FILES[name]:
+                raise ValueError(f"{name} 的临时文件 SHA-256 不匹配")
+
+        for name, temporary in zip(payloads, temporary_files):
+            temporary.replace(output_dir / name)
     finally:
-        if temporary.exists():
-            temporary.unlink()
+        for temporary in temporary_files:
+            if temporary.exists():
+                temporary.unlink()
 
-    return summary
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="准备或校验 Koishi 中文资源")
-    commands = parser.add_subparsers(dest="command", required=True)
-
-    prepare = commands.add_parser("prepare", help="从原始补丁生成净化归档")
-    prepare.add_argument("source", type=Path)
-    prepare.add_argument("output", type=Path)
-
-    verify = commands.add_parser("verify", help="校验净化归档")
-    verify.add_argument("archive", type=Path)
-
-    return parser
+    return validate_assets(output_dir)
 
 
 def main() -> int:
-    args = build_parser().parse_args()
+    parser = argparse.ArgumentParser(description="准备或校验 Koishi 中文资源散文件")
+    commands = parser.add_subparsers(dest="command", required=True)
+
+    prepare = commands.add_parser("prepare", help="从原始补丁提取三个散文件")
+    prepare.add_argument("source", type=Path)
+    prepare.add_argument("output_dir", type=Path)
+
+    verify = commands.add_parser("verify", help="校验三个散文件")
+    verify.add_argument("directory", type=Path)
+
+    args = parser.parse_args()
     try:
         if args.command == "prepare":
-            summary = prepare_archive(args.source, args.output)
-            target = args.output
+            target = args.output_dir
+            summary = prepare_assets(args.source, target)
         else:
-            summary = validate_archive(args.archive)
-            target = args.archive
+            target = args.directory
+            summary = validate_assets(target)
     except (OSError, KeyError, ValueError, zipfile.BadZipFile) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
@@ -324,50 +329,38 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
-- [ ] **Step 4: 从用户 ZIP 生成净化归档**
+- [ ] **Step 4: 删除二次 ZIP 并提取三个散文件**
 
-先确认用户已把原始 ZIP 重新放回仓库根目录：
+先确认原始输入仍存在且哈希正确：
 
 ```powershell
 Test-Path -LiteralPath "【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip"
+(Get-FileHash -LiteralPath "【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip" -Algorithm SHA256).Hash
 ```
 
-Expected: `True`。若为 `False`，停止任务并请用户重新提供文件，不执行后续命令。
+Expected: `True`，哈希为 `0A8F32C2D6ADFB11D32A14F84E42F77C6C1ED1D368F5FF468B1DCCF213F46783`。
 
-Run:
+删除已跟踪的二次 ZIP，再生成散文件：
 
 ```powershell
-python game-engine/utils/prepare_zh_assets.py prepare "【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip" game-engine/resources/zh/koishi-assets.zip
+git rm -- game-engine/resources/zh/koishi-assets.zip
+python game-engine/utils/prepare_zh_assets.py prepare "【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip" game-engine/resources/zh
 ```
 
-Expected: 退出码为 0，输出以 `OK:` 开头，`GXT 表=79`，中文字符数大于 100。
+Expected: 退出码为 0，输出包含 `GXT 表=79` 和 `中文字符=43292`。
 
-随后只列出归档成员：
+- [ ] **Step 5: 更新说明与忽略注释**
 
-```powershell
-python -c "import zipfile; z=zipfile.ZipFile(r'game-engine/resources/zh/koishi-assets.zip'); print('\n'.join(z.namelist()))"
-```
-
-Expected:
-
-```text
-wm_vcchs.gxt
-wm_vcchs.txd
-wm_vcchs.dat
-```
-
-- [ ] **Step 5: 记录来源、边界和复现命令**
-
-创建 `game-engine/resources/zh/README.md`：
+用以下完整内容替换 `game-engine/resources/zh/README.md`：
 
 ```markdown
 # Koishi 简体中文资源
 
 本目录用于私人构建 GTA Vice City 浏览器版简体中文支持。
 
-`koishi-assets.zip` 由根目录的
+以下三个散文件由仓库根目录的
 `【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip`
-净化生成，只包含：
+校验后提取：
 
 | 文件 | SHA-256 |
 |---|---|
@@ -379,21 +372,21 @@ wm_vcchs.dat
 
 `0A8F32C2D6ADFB11D32A14F84E42F77C6C1ED1D368F5FF468B1DCCF213F46783`
 
-生成：
+提取：
 
 ```powershell
-python game-engine/utils/prepare_zh_assets.py prepare "【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip" game-engine/resources/zh/koishi-assets.zip
+python game-engine/utils/prepare_zh_assets.py prepare "【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip" game-engine/resources/zh
 ```
 
 校验：
 
 ```powershell
-python game-engine/utils/prepare_zh_assets.py verify game-engine/resources/zh/koishi-assets.zip
+python game-engine/utils/prepare_zh_assets.py verify game-engine/resources/zh
 python -m unittest discover -s game-engine/utils -p "test_prepare_zh_assets.py" -v
 ```
 
 原补丁中的 `Mss32.dll`、`OriginalMss32.dll` 和 `wm_vcchs.asi`
-是 Windows x86 可执行文件，不会执行或进入净化归档。
+是 Windows x86 可执行文件，不会提取、执行或提交。
 
 汉化程序源码来自无名汉化组：
 <https://github.com/WMHHZ/VC.SA.Plugin>，源码采用 MIT 许可证。
@@ -403,75 +396,96 @@ python -m unittest discover -s game-engine/utils -p "test_prepare_zh_assets.py" 
 
 当前公开仓库没有完整 vc-sky 游戏源码与可复现的 Emscripten 构建链。
 在取得完整游戏目标、构建步骤、Emscripten 版本和许可前，不增加
-`lang=zh`，也不创建假的中文 WASM、`packages/zh.js` 或
+`lang=zh`，也不创建中文 WASM、`packages/zh.js` 或
 `asm_consts/zh.js`。
 ```
 
-在根 `.gitignore` 的末尾加入：
+把根 `.gitignore` 末尾的注释改为：
 
 ```gitignore
-
-# Private source archive; only the sanitized GXT/TXD/DAT archive is tracked.
+# Private source archive; only the extracted GXT/TXD/DAT files are tracked.
 /【汉化补丁】罪恶都市无名汉化组汉化补丁 v1.0(Koishi).zip
 ```
 
-- [ ] **Step 6: 运行集成测试并确认通过**
+- [ ] **Step 6: 运行散文件集成测试并确认通过**
 
 Run:
 
 ```powershell
 python -m unittest discover -s game-engine/utils -p "test_prepare_zh_assets.py" -v
-python game-engine/utils/prepare_zh_assets.py verify game-engine/resources/zh/koishi-assets.zip
+python game-engine/utils/prepare_zh_assets.py verify game-engine/resources/zh
 ```
 
 Expected:
 
 ```text
-test_sanitized_archive_contract ... ok
+test_extracted_assets_contract ... ok
 Ran 1 test in ...
 OK
-OK: game-engine\resources\zh\koishi-assets.zip，GXT 表=79，中文字符=...
+OK: game-engine\resources\zh，GXT 表=79，中文字符=43292
 ```
 
-- [ ] **Step 7: 验证 Git 边界和仓库完整性**
+- [ ] **Step 7: 验证文件、Git 和语言入口边界**
 
 Run:
 
 ```powershell
 git diff --check
+Get-ChildItem -LiteralPath game-engine/resources/zh -File | Select-Object -ExpandProperty Name
+git ls-files | rg -i "\.(zip|dll|asi)$"
+rg -n "lang=zh|vc-sky-zh|packages/zh|asm_consts/zh" game-engine/dist game-engine/README.md
 git status --short
-git ls-files | rg -i "\.(dll|asi)$"
 ```
 
 Expected:
 
-- `git diff --check` 无输出，退出码为 0。
-- `git status --short` 只显示本任务列出的共五个路径；计划文档应已在本计划开始实施前单独提交。
-- `git ls-files | rg -i "\.(dll|asi)$"` 无输出；`rg` 因无匹配返回 1 是预期结果。
-- 根目录原始 ZIP 不再出现在 `git status`，但文件仍保留在磁盘上。
+- 资源目录只列出 `README.md`、`wm_vcchs.gxt`、`wm_vcchs.txd`、`wm_vcchs.dat`。
+- `git ls-files | rg -i "\.(zip|dll|asi)$"` 无输出；`rg` 返回 1。
+- 中文入口扫描无输出；`rg` 返回 1。
+- 原始 ZIP 不出现在 `git status`，但 `Test-Path` 仍为 `True`。
+- 工作区只包含本任务列出的产品文件变更。
 
-再确认没有过早接入中文入口：
-
-```powershell
-rg -n "lang=zh|vc-sky-zh|packages/zh|asm_consts/zh" game-engine/dist game-engine/README.md
-```
-
-Expected: 无输出，`rg` 返回 1。
-
-- [ ] **Step 8: 提交资源准备阶段**
+- [ ] **Step 8: 提交散文件实现**
 
 ```powershell
-git add -- .gitignore game-engine/utils/prepare_zh_assets.py game-engine/utils/test_prepare_zh_assets.py game-engine/resources/zh/README.md game-engine/resources/zh/koishi-assets.zip
+git add -- .gitignore game-engine/utils/prepare_zh_assets.py game-engine/utils/test_prepare_zh_assets.py game-engine/resources/zh/README.md game-engine/resources/zh/wm_vcchs.gxt game-engine/resources/zh/wm_vcchs.txd game-engine/resources/zh/wm_vcchs.dat
 git diff --cached --check
 git diff --cached --name-only
-git commit -m "feat: prepare sanitized Chinese localization assets"
+git commit -m "fix: store Chinese localization assets unpacked"
 ```
 
-Expected: `git diff --cached --check` 无输出，暂存区只包含上述五个路径；提交不包含原始 ZIP、DLL、ASI、计划文档或启动器改动。
+Expected: 暂存区不含原始 ZIP、二次 ZIP、DLL、ASI、依赖、启动器或 WASM 改动。
+
+- [ ] **Step 9: 重写未推送实现历史，彻底移除二次 ZIP**
+
+本步骤只在前述测试、任务审查通过且工作区干净后执行。用户已明确选择方案一，允许重写尚未推送的本地提交。固定重写基点为：
+
+`5699ac7c0e34edd19660ce4281806cd754a6b1e6`
+
+Run:
+
+```powershell
+$rewriteBase = "5699ac7c0e34edd19660ce4281806cd754a6b1e6"
+git status --short
+git diff --name-status "$rewriteBase..HEAD"
+git reset --soft $rewriteBase
+git diff --cached --check
+git diff --cached --name-only
+git commit -m "feat: prepare extracted Chinese localization assets"
+git rev-list --objects HEAD | rg "game-engine/resources/zh/koishi-assets.zip"
+```
+
+Expected:
+
+- 重写前 `git status --short` 无输出。
+- 重写后的单一新提交包含已批准的规格/计划修订、脚本、测试、README 和三个散文件。
+- `git diff --cached --name-only` 不包含原始 ZIP 或 `koishi-assets.zip`。
+- 最后一条 `rg` 无输出并返回 1，证明最终可达 Git 历史没有二次 ZIP 对象。
+- 不执行 `git push`。
 
 ## 后续计划入口
 
-本计划完成后，仓库只具备安全、可复现的汉化资源输入，不具备可运行的中文游戏。
+本计划完成后，仓库只具备经过固定哈希验证的三个中文资源散文件，不具备可运行的中文游戏。
 
 只有拿到以下全部输入后，才编写第二份“中文 WASM 原生移植实施计划”：
 
@@ -479,9 +493,7 @@ Expected: `git diff --cached --check` 无输出，暂存区只包含上述五个
 2. 包含 `BUILD_DZ`、异步资源和虚拟文件系统适配的游戏构建目标；
 3. 固定 Emscripten 版本及生成 WASM、运行时 JS、`ASM_CONSTS` 的准确命令；
 4. 使用当前英语数据包进入主菜单的基线验证方法；
-5. 允许私人修改和构建的明确授权。
-6. 中文字符类型固定为 16 位的方案：使用 `char16_t`/`uint16_t`、
-   `static_assert(sizeof(CharType) == 2)`，并显式转换 reVC 字符缓冲区，
-   不直接复用 Emscripten 下通常为 32 位的 `wchar_t`。
+5. 允许私人修改和构建的明确授权；
+6. 使用 `char16_t`/`uint16_t` 和 `static_assert(sizeof(CharType) == 2)` 固定中文字符为 16 位，并显式转换 reVC 字符缓冲区。
 
 任一输入缺失时，停止在本计划的资源准备成果，不转向二进制补丁、HTML 字幕覆盖或重新制作传统 reVC 浏览器端口。
